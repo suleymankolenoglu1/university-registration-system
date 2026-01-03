@@ -1,70 +1,51 @@
 package com.university.model;
 
-import java. time.LocalDateTime;
+import java.time.LocalDateTime;
 
 public class Enrollment {
     private int enrollmentId;
     private int studentId;
     private int sectionId;
-    private EnrollmentStatus status;
     private LocalDateTime enrollmentDate;
-    private Integer waitlistPosition;
-
-    public enum EnrollmentStatus {
-        ENROLLED,
-        WAITLIST,
-        DROPPED
-    }
+    private String status; // ENROLLED, DROPPED, COMPLETED
+    private String grade;
+    
+    // İlişkili objeler
+    private Student student;
+    private Section section;
 
     public Enrollment() {}
 
     // Getters
-    public int getEnrollmentId() {
-        return enrollmentId;
-    }
-
-    public int getStudentId() {
-        return studentId;
-    }
-
-    public int getSectionId() {
-        return sectionId;
-    }
-
-    public EnrollmentStatus getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getEnrollmentDate() {
-        return enrollmentDate;
-    }
-
-    public Integer getWaitlistPosition() {
-        return waitlistPosition;
-    }
+    public int getEnrollmentId() { return enrollmentId; }
+    public int getStudentId() { return studentId; }
+    public int getSectionId() { return sectionId; }
+    public LocalDateTime getEnrollmentDate() { return enrollmentDate; }
+    public String getStatus() { return status; }
+    public String getGrade() { return grade; }
+    public Student getStudent() { return student; }
+    public Section getSection() { return section; }
 
     // Setters
-    public void setEnrollmentId(int enrollmentId) {
-        this.enrollmentId = enrollmentId;
+    public void setEnrollmentId(int enrollmentId) { this.enrollmentId = enrollmentId; }
+    public void setStudentId(int studentId) { this.studentId = studentId; }
+    public void setSectionId(int sectionId) { this.sectionId = sectionId; }
+    public void setEnrollmentDate(LocalDateTime enrollmentDate) { this.enrollmentDate = enrollmentDate; }
+    public void setStatus(String status) { this.status = status; }
+    public void setGrade(String grade) { this.grade = grade; }
+    public void setStudent(Student student) { this.student = student; }
+    public void setSection(Section section) { this.section = section; }
+
+    public boolean isEnrolled() {
+        return "ENROLLED".equals(status);
     }
 
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
+    public boolean isCompleted() {
+        return "COMPLETED".equals(status);
     }
 
-    public void setSectionId(int sectionId) {
-        this.sectionId = sectionId;
-    }
-
-    public void setStatus(EnrollmentStatus status) {
-        this.status = status;
-    }
-
-    public void setEnrollmentDate(LocalDateTime enrollmentDate) {
-        this.enrollmentDate = enrollmentDate;
-    }
-
-    public void setWaitlistPosition(Integer waitlistPosition) {
-        this.waitlistPosition = waitlistPosition;
+    @Override
+    public String toString() {
+        return "Enrollment{studentId=" + studentId + ", sectionId=" + sectionId + ", status=" + status + "}";
     }
 }

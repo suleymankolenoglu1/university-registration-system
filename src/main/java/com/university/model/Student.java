@@ -1,91 +1,49 @@
-package com.university. model;
+package com.university.model;
 
 import java.time.LocalDateTime;
 
 public class Student {
     private int studentId;
-    private String name;
+    private String studentNumber;
+    private String firstName;
+    private String lastName;
     private String email;
     private String password;
     private String department;
-    private int enrollmentYear;
+    private int semester;
     private LocalDateTime createdAt;
 
-    // Boş constructor
     public Student() {}
 
-    // Parametreli constructor
-    public Student(int studentId, String name, String email, String department) {
-        this. studentId = studentId;
-        this. name = name;
-        this.email = email;
-        this.department = department;
-    }
+    // Getters
+    public int getStudentId() { return studentId; }
+    public String getStudentNumber() { return studentNumber; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getEmail() { return email; }
+    public String getPassword() { return password; }
+    public String getDepartment() { return department; }
+    public int getSemester() { return semester; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    // Getter ve Setter metodları
-    public int getStudentId() {
-        return studentId;
-    }
+    // Setters
+    public void setStudentId(int studentId) { this.studentId = studentId; }
+    public void setStudentNumber(String studentNumber) { this.studentNumber = studentNumber; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setEmail(String email) { this.email = email; }
+    public void setPassword(String password) { this.password = password; }
+    public void setDepartment(String department) { this.department = department; }
+    public void setSemester(int semester) { this.semester = semester; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this. department = department;
-    }
-
-    public int getEnrollmentYear() {
-        return enrollmentYear;
-    }
-
-    public void setEnrollmentYear(int enrollmentYear) {
-        this.enrollmentYear = enrollmentYear;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this. createdAt = createdAt;
+    // Tam ad
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
 
     @Override
     public String toString() {
-        return "Student{" +
-                "studentId=" + studentId +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", department='" + department + '\'' +
-                '}';
+        return "Student{" + studentNumber + ", " + getFullName() + ", " + department + "}";
     }
 }

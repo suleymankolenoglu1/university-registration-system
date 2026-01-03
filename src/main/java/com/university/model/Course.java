@@ -1,78 +1,50 @@
 package com.university.model;
 
+import java.time.LocalDateTime;
+
 public class Course {
     private int courseId;
     private String courseCode;
-    private String name;
+    private String courseName;
     private int credits;
+    private String description;
+    private Integer prerequisiteCourseId;
     private String department;
-    private Integer prerequisiteId; // null olabilir
+    private LocalDateTime createdAt;
+    
+    // İlişkili obje (JOIN için)
+    private Course prerequisiteCourse;
 
     public Course() {}
 
-    public Course(int courseId, String courseCode, String name, int credits) {
-        this.courseId = courseId;
-        this.courseCode = courseCode;
-        this.name = name;
-        this.credits = credits;
-    }
-
     // Getters
-    public int getCourseId() {
-        return courseId;
-    }
-
-    public String getCourseCode() {
-        return courseCode;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getCredits() {
-        return credits;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public Integer getPrerequisiteId() {
-        return prerequisiteId;
-    }
+    public int getCourseId() { return courseId; }
+    public String getCourseCode() { return courseCode; }
+    public String getCourseName() { return courseName; }
+    public int getCredits() { return credits; }
+    public String getDescription() { return description; }
+    public Integer getPrerequisiteCourseId() { return prerequisiteCourseId; }
+    public String getDepartment() { return department; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public Course getPrerequisiteCourse() { return prerequisiteCourse; }
 
     // Setters
-    public void setCourseId(int courseId) {
-        this.courseId = courseId;
-    }
+    public void setCourseId(int courseId) { this.courseId = courseId; }
+    public void setCourseCode(String courseCode) { this.courseCode = courseCode; }
+    public void setCourseName(String courseName) { this.courseName = courseName; }
+    public void setCredits(int credits) { this.credits = credits; }
+    public void setDescription(String description) { this.description = description; }
+    public void setPrerequisiteCourseId(Integer prerequisiteCourseId) { this.prerequisiteCourseId = prerequisiteCourseId; }
+    public void setDepartment(String department) { this.department = department; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setPrerequisiteCourse(Course prerequisiteCourse) { this.prerequisiteCourse = prerequisiteCourse; }
 
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCredits(int credits) {
-        this.credits = credits;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
-    public void setPrerequisiteId(Integer prerequisiteId) {
-        this.prerequisiteId = prerequisiteId;
+    public boolean hasPrerequisite() {
+        return prerequisiteCourseId != null;
     }
 
     @Override
     public String toString() {
-        return "Course{" +
-                "courseCode='" + courseCode + '\'' +
-                ", name='" + name + '\'' +
-                ", credits=" + credits +
-                '}';
+        return "Course{" + courseCode + " - " + courseName + ", " + credits + " kredi}";
     }
 }

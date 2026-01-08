@@ -1,77 +1,77 @@
 package com.university.service;
 
-import com.university.model.Timetable;
 import com.university.model.Section;
 import com.university.model.Room;
-import com.university.dao.TimetableDAO;
+import com.university.model.Enrollment;
 import com.university.dao.SectionDAO;
 import com.university.dao.RoomDAO;
 import com.university.dao.EnrollmentDAO;
 
-import java.time. LocalTime;
-import java. util.List;
-import java.util. ArrayList;
+import java.sql.SQLException;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.ArrayList;
 
 public class ScheduleService {
 
-    private TimetableDAO timetableDAO;
     private SectionDAO sectionDAO;
     private RoomDAO roomDAO;
     private EnrollmentDAO enrollmentDAO;
 
     public ScheduleService() {
-        this.timetableDAO = new TimetableDAO();
         this.sectionDAO = new SectionDAO();
         this.roomDAO = new RoomDAO();
         this.enrollmentDAO = new EnrollmentDAO();
     }
 
     // Constructor injection (test için)
-    public ScheduleService(TimetableDAO timetableDAO, SectionDAO sectionDAO,
-                           RoomDAO roomDAO, EnrollmentDAO enrollmentDAO) {
-        this.timetableDAO = timetableDAO;
+    public ScheduleService(SectionDAO sectionDAO, RoomDAO roomDAO, EnrollmentDAO enrollmentDAO) {
         this.sectionDAO = sectionDAO;
-        this. roomDAO = roomDAO;
-        this. enrollmentDAO = enrollmentDAO;
+        this.roomDAO = roomDAO;
+        this.enrollmentDAO = enrollmentDAO;
     }
 
     /**
      * Öğrencinin mevcut programıyla yeni section çakışıyor mu?
      */
     public boolean hasTimeConflict(int studentId, int newSectionId) {
-        // Öğrencinin kayıtlı olduğu section'ların zaman bilgilerini al
-        List<Timetable> studentSchedule = getStudentSchedule(studentId);
-        
-        // Yeni section'ın zaman bilgilerini al
-        List<Timetable> newSectionTimes = timetableDAO.findBySectionId(newSectionId);
+        try {
+            // Yeni section bilgilerini al
+            Section newSection = sectionDAO.findById(newSectionId);
+            if (newSection == null) {
+                return false;
+            }
 
-        // Her bir zaman dilimini kontrol et
-        for (Timetable existingTime : studentSchedule) {
-            for (Timetable newTime : newSectionTimes) {
-                if (isOverlapping(existingTime, newTime)) {
-                    return true; // Çakışma var! 
+            // Öğrencinin kayıtlı olduğu section'ları al
+            List<Section> studentSections = getStudentSchedule(studentId);
+
+            // Her bir section ile çakışma kontrolü
+            for (Section existingSection : studentSections) {
+                if (isOverlapping(existingSection, newSection)) {
+                    return true; // Çakışma var!
                 }
             }
-        }
 
-        return false; // Çakışma yok
+            return false; // Çakışma yok
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     /**
-     * İki zaman dilimi çakışıyor mu?
+     * İki section'ın zamanları çakışıyor mu?
      */
-    public boolean isOverlapping(Timetable t1, Timetable t2) {
+    public boolean isOverlapping(Section s1, Section s2) {
         // Farklı günlerdeyse çakışma yok
-        if (! t1.getDayOfWeek().equalsIgnoreCase(t2.getDayOfWeek())) {
+        if (!s1.getDayOfWeek().equalsIgnoreCase(s2.getDayOfWeek())) {
             return false;
         }
 
         // Aynı gündeler, saatleri kontrol et
-        // Çakışma durumu: t1.start < t2.end VE t2.start < t1.end
-        LocalTime start1 = t1.getStartTime();
-        LocalTime end1 = t1.getEndTime();
-        LocalTime start2 = t2.getStartTime();
-        LocalTime end2 = t2.getEndTime();
+        LocalTime start1 = s1.getStartTime();
+        LocalTime end1 = s1.getEndTime();
+        LocalTime start2 = s2.getStartTime();
+        LocalTime end2 = s2.getEndTime();
 
         return start1.isBefore(end2) && start2.isBefore(end1);
     }
@@ -79,120 +79,112 @@ public class ScheduleService {
     /**
      * Öğrencinin haftalık ders programını getir
      */
-    public List<Timetable> getStudentSchedule(int studentId) {
-        // Öğrencinin kayıtlı olduğu section ID'lerini al
-        List<Integer> enrolledSectionIds = enrollmentDAO.getEnrolledSectionIds(studentId);
-
-        List<Timetable> schedule = new ArrayList<>();
-
-        // Her section'ın zaman bilgilerini topla
-        for (Integer sectionId : enrolledSectionIds) {
-            List<Timetable> sectionTimes = timetableDAO.findBySectionId(sectionId);
-            schedule.addAll(sectionTimes);
+    public List<Section> getStudentSchedule(int studentId) {
+        List<Section> schedule = new ArrayList<>();
+        try {
+            List<Enrollment> enrollments = enrollmentDAO.findActiveByStudent(studentId);
+            for (Enrollment e : enrollments) {
+                Section section = sectionDAO.findById(e.getSectionId());
+                if (section != null) {
+                    schedule.add(section);
+                }
+            }
+        } catch (SQLException e) {
+            // Hata durumunda boş liste döner
         }
-
         return schedule;
     }
 
     /**
      * Öğretim elemanının haftalık programını getir
      */
-    public List<Timetable> getInstructorSchedule(int instructorId) {
-        // Öğretim elemanının verdiği section'ları bul
-        List<Section> instructorSections = sectionDAO.findByInstructorId(instructorId);
-
-        List<Timetable> schedule = new ArrayList<>();
-
-        for (Section section : instructorSections) {
-            List<Timetable> sectionTimes = timetableDAO.findBySectionId(section.getSectionId());
-            schedule.addAll(sectionTimes);
+    public List<Section> getInstructorSchedule(int instructorId) {
+        try {
+            return sectionDAO.findByInstructor(instructorId);
+        } catch (SQLException e) {
+            return new ArrayList<>();
         }
-
-        return schedule;
-    }
-
-    /**
-     * Section'ın ders programını getir
-     */
-    public List<Timetable> getSectionSchedule(int sectionId) {
-        return timetableDAO. findBySectionId(sectionId);
     }
 
     /**
      * Belirli bir zaman diliminde boş derslikleri bul
      */
-    public List<Room> findAvailableRooms(String dayOfWeek, LocalTime startTime, LocalTime endTime) {
-        List<Room> allRooms = roomDAO.findAll();
-        List<Room> availableRooms = new ArrayList<>();
-
-        for (Room room : allRooms) {
-            if (isRoomAvailable(room. getRoomId(), dayOfWeek, startTime, endTime)) {
-                availableRooms.add(room);
-            }
+    public List<Room> findAvailableRooms(String dayOfWeek, LocalTime startTime, LocalTime endTime, String semester) {
+        try {
+            return roomDAO.findAvailable(dayOfWeek, 
+                java.sql.Time.valueOf(startTime), 
+                java.sql.Time.valueOf(endTime), 
+                semester);
+        } catch (SQLException e) {
+            return new ArrayList<>();
         }
-
-        return availableRooms;
     }
 
     /**
      * Derslik belirli zamanda müsait mi?
      */
     public boolean isRoomAvailable(int roomId, String dayOfWeek, 
-                                    LocalTime startTime, LocalTime endTime) {
-        List<Timetable> roomSchedule = timetableDAO.findByRoomId(roomId);
-
-        // Geçici bir Timetable oluştur karşılaştırma için
-        Timetable newTime = new Timetable();
-        newTime.setDayOfWeek(dayOfWeek);
-        newTime.setStartTime(startTime);
-        newTime.setEndTime(endTime);
-
-        for (Timetable existing : roomSchedule) {
-            if (isOverlapping(existing, newTime)) {
-                return false; // Derslik dolu
+                                    LocalTime startTime, LocalTime endTime, String semester) {
+        try {
+            List<Section> sections = sectionDAO.findBySemester(semester);
+            
+            for (Section section : sections) {
+                if (section.getRoomId() != null && section.getRoomId() == roomId) {
+                    if (section.getDayOfWeek().equalsIgnoreCase(dayOfWeek)) {
+                        // Zaman çakışması kontrolü
+                        if (startTime.isBefore(section.getEndTime()) && 
+                            endTime.isAfter(section.getStartTime())) {
+                            return false; // Derslik dolu
+                        }
+                    }
+                }
             }
+            return true; // Derslik müsait
+        } catch (SQLException e) {
+            return false;
         }
-
-        return true; // Derslik müsait
     }
 
     /**
      * Öğrenci için uygun section öner (çakışma olmayan)
      */
     public List<Section> suggestNonConflictingSections(int studentId, int courseId) {
-        List<Section> allSections = sectionDAO.findByCourseId(courseId);
         List<Section> availableSections = new ArrayList<>();
+        try {
+            List<Section> allSections = sectionDAO.findByCourse(courseId);
 
-        for (Section section : allSections) {
-            // Kontenjan dolu mu?
-            if (section.isFull()) {
-                continue;
-            }
+            for (Section section : allSections) {
+                // Kontenjan dolu mu?
+                if (section.isFull()) {
+                    continue;
+                }
 
-            // Çakışma var mı?
-            if (! hasTimeConflict(studentId, section. getSectionId())) {
-                availableSections.add(section);
+                // Çakışma var mı?
+                if (!hasTimeConflict(studentId, section.getSectionId())) {
+                    availableSections.add(section);
+                }
             }
+        } catch (SQLException e) {
+            // Hata durumunda boş liste döner
         }
-
         return availableSections;
     }
 
     /**
      * Öğrencinin programını güne göre getir
      */
-    public List<Timetable> getScheduleByDay(int studentId, String dayOfWeek) {
-        List<Timetable> fullSchedule = getStudentSchedule(studentId);
-        List<Timetable> daySchedule = new ArrayList<>();
+    public List<Section> getScheduleByDay(int studentId, String dayOfWeek) {
+        List<Section> fullSchedule = getStudentSchedule(studentId);
+        List<Section> daySchedule = new ArrayList<>();
 
-        for (Timetable t : fullSchedule) {
-            if (t.getDayOfWeek().equalsIgnoreCase(dayOfWeek)) {
-                daySchedule.add(t);
+        for (Section s : fullSchedule) {
+            if (s.getDayOfWeek().equalsIgnoreCase(dayOfWeek)) {
+                daySchedule.add(s);
             }
         }
 
         // Saate göre sırala
-        daySchedule.sort((t1, t2) -> t1.getStartTime().compareTo(t2.getStartTime()));
+        daySchedule.sort((s1, s2) -> s1.getStartTime().compareTo(s2.getStartTime()));
 
         return daySchedule;
     }
@@ -200,7 +192,7 @@ public class ScheduleService {
     /**
      * Programı formatla (görüntüleme için)
      */
-    public String formatSchedule(List<Timetable> schedule) {
+    public String formatSchedule(List<Section> schedule) {
         if (schedule == null || schedule.isEmpty()) {
             return "Program boş";
         }
@@ -208,24 +200,24 @@ public class ScheduleService {
         StringBuilder sb = new StringBuilder();
         String currentDay = "";
 
-        // Güne göre grupla
-        schedule.sort((t1, t2) -> {
-            int dayCompare = getDayOrder(t1.getDayOfWeek()) - getDayOrder(t2.getDayOfWeek());
+        // Güne göre grupla ve sırala
+        schedule.sort((s1, s2) -> {
+            int dayCompare = getDayOrder(s1.getDayOfWeek()) - getDayOrder(s2.getDayOfWeek());
             if (dayCompare != 0) return dayCompare;
-            return t1.getStartTime().compareTo(t2.getStartTime());
+            return s1.getStartTime().compareTo(s2.getStartTime());
         });
 
-        for (Timetable t : schedule) {
-            if (!t.getDayOfWeek().equals(currentDay)) {
-                currentDay = t.getDayOfWeek();
+        for (Section s : schedule) {
+            if (!s.getDayOfWeek().equals(currentDay)) {
+                currentDay = s.getDayOfWeek();
                 sb.append("\n").append(currentDay).append(":\n");
             }
-            sb. append(String.format("  %s - %s\n", 
-                t.getStartTime().toString(), 
-                t.getEndTime().toString()));
+            sb.append(String.format("  %s - %s\n", 
+                s.getStartTime().toString(), 
+                s.getEndTime().toString()));
         }
 
-        return sb. toString();
+        return sb.toString();
     }
 
     /**
@@ -233,13 +225,13 @@ public class ScheduleService {
      */
     private int getDayOrder(String day) {
         switch (day.toUpperCase()) {
-            case "MONDAY":  return 1;
-            case "TUESDAY": return 2;
-            case "WEDNESDAY": return 3;
-            case "THURSDAY":  return 4;
-            case "FRIDAY": return 5;
-            case "SATURDAY": return 6;
-            case "SUNDAY": return 7;
+            case "PAZARTESI": return 1;
+            case "SALI": return 2;
+            case "CARSAMBA": return 3;
+            case "PERSEMBE": return 4;
+            case "CUMA": return 5;
+            case "CUMARTESI": return 6;
+            case "PAZAR": return 7;
             default: return 8;
         }
     }

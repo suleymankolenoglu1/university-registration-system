@@ -1,10 +1,11 @@
 package com.university.service;
 
 import com.university.model.Student;
-import com. university.model. Instructor;
+import com.university.model.Instructor;
 import com.university.dao.StudentDAO;
-import com.university. dao.InstructorDAO;
+import com.university.dao.InstructorDAO;
 import org.mindrot.jbcrypt.BCrypt;
+import java.sql.SQLException;
 
 public class AuthService {
 
@@ -34,19 +35,23 @@ public class AuthService {
             return LoginResult.failure("Şifre boş olamaz");
         }
 
-        // Öğrenciyi bul
-        Student student = studentDAO.findByEmail(email. trim().toLowerCase());
+        try {
+            // Öğrenciyi bul
+            Student student = studentDAO.findByEmail(email.trim().toLowerCase());
 
-        if (student == null) {
-            return LoginResult.failure("Bu email ile kayıtlı öğrenci bulunamadı");
+            if (student == null) {
+                return LoginResult.failure("Bu email ile kayıtlı öğrenci bulunamadı");
+            }
+
+            // Şifre kontrolü
+            if (!verifyPassword(password, student.getPassword())) {
+                return LoginResult.failure("Şifre hatalı");
+            }
+
+            return LoginResult.success(student, LoginResult.UserType.STUDENT);
+        } catch (SQLException e) {
+            return LoginResult.failure("Veritabanı hatası: " + e.getMessage());
         }
-
-        // Şifre kontrolü
-        if (! verifyPassword(password, student.getPassword())) {
-            return LoginResult.failure("Şifre hatalı");
-        }
-
-        return LoginResult.success(student, LoginResult.UserType. STUDENT);
     }
 
     /**
@@ -60,67 +65,75 @@ public class AuthService {
             return LoginResult.failure("Şifre boş olamaz");
         }
 
-        Instructor instructor = instructorDAO.findByEmail(email. trim().toLowerCase());
+        try {
+            Instructor instructor = instructorDAO.findByEmail(email.trim().toLowerCase());
 
-        if (instructor == null) {
-            return LoginResult.failure("Bu email ile kayıtlı öğretim elemanı bulunamadı");
+            if (instructor == null) {
+                return LoginResult.failure("Bu email ile kayıtlı öğretim elemanı bulunamadı");
+            }
+
+            if (!verifyPassword(password, instructor.getPassword())) {
+                return LoginResult.failure("Şifre hatalı");
+            }
+
+            return LoginResult.success(instructor, LoginResult.UserType.INSTRUCTOR);
+        } catch (SQLException e) {
+            return LoginResult.failure("Veritabanı hatası: " + e.getMessage());
         }
-
-        if (!verifyPassword(password, instructor.getPassword())) {
-            return LoginResult.failure("Şifre hatalı");
-        }
-
-        return LoginResult.success(instructor, LoginResult.UserType.INSTRUCTOR);
     }
 
-    /**
-     * Yeni öğrenci kaydı
-     */
-    public LoginResult registerStudent(String name, String email, String password, 
-                                        String department, int enrollmentYear) {
-        // Validasyonlar
-        if (name == null || name.trim().isEmpty()) {
-            return LoginResult.failure("İsim boş olamaz");
-        }
-        if (email == null || email.trim().isEmpty()) {
-            return LoginResult.failure("Email boş olamaz");
-        }
-        if (! isValidEmail(email)) {
-            return LoginResult.failure("Geçersiz email formatı");
-        }
-        if (password == null || password. length() < 6) {
-            return LoginResult.failure("Şifre en az 6 karakter olmalı");
-        }
+    public LoginResult registerStudent(String firstName, String lastName, String studentNumber,
+                                    String email, String password, String department, int semester) {
+    // Validasyonlar
+    if (firstName == null || firstName.trim().isEmpty()) {
+        return LoginResult.failure("İsim boş olamaz");
+    }
+    if (email == null || email.trim().isEmpty()) {
+        return LoginResult.failure("Email boş olamaz");
+    }
+    if (!isValidEmail(email)) {
+        return LoginResult.failure("Geçersiz email formatı");
+    }
+    if (password == null || password.length() < 6) {
+        return LoginResult.failure("Şifre en az 6 karakter olmalı");
+    }
 
+    try {
         // Email kullanılıyor mu?
-        if (studentDAO.findByEmail(email. trim().toLowerCase()) != null) {
+        if (studentDAO.findByEmail(email.trim().toLowerCase()) != null) {
             return LoginResult.failure("Bu email adresi zaten kullanılıyor");
         }
 
         // Yeni öğrenci oluştur
         Student student = new Student();
-        student.setName(name.trim());
+        student.setStudentNumber(studentNumber);
+        student.setFirstName(firstName.trim());
+        student.setLastName(lastName.trim());
         student.setEmail(email.trim().toLowerCase());
         student.setPassword(hashPassword(password));
         student.setDepartment(department);
-        student.setEnrollmentYear(enrollmentYear);
+        student.setSemester(semester);
 
         // Kaydet
-        boolean saved = studentDAO.save(student);
+        int studentId = studentDAO.create(student);
 
-        if (saved) {
+        if (studentId > 0) {
+            student.setStudentId(studentId);
             return LoginResult.success(student, LoginResult.UserType.STUDENT);
         } else {
             return LoginResult.failure("Kayıt sırasında bir hata oluştu");
         }
+    } catch (SQLException e) {
+        return LoginResult.failure("Veritabanı hatası: " + e.getMessage());
     }
+}
 
     /**
      * Yeni öğretim elemanı kaydı
      */
-    public LoginResult registerInstructor(String name, String email, 
-                                           String password, String department) {
-        if (name == null || name.trim().isEmpty()) {
+    public LoginResult registerInstructor(String firstName, String lastName, String instructorNumber,
+                                           String email, String password, String title, String department) {
+        if (firstName == null || firstName.trim().isEmpty()) {
             return LoginResult.failure("İsim boş olamaz");
         }
         if (email == null || email.trim().isEmpty()) {
@@ -133,27 +146,36 @@ public class AuthService {
             return LoginResult.failure("Şifre en az 6 karakter olmalı");
         }
 
-        if (instructorDAO. findByEmail(email.trim().toLowerCase()) != null) {
-            return LoginResult. failure("Bu email adresi zaten kullanılıyor");
-        }
+        try {
+            if (instructorDAO.findByEmail(email.trim().toLowerCase()) != null) {
+                return LoginResult.failure("Bu email adresi zaten kullanılıyor");
+            }
 
-        Instructor instructor = new Instructor();
-        instructor.setName(name.trim());
-        instructor.setEmail(email.trim().toLowerCase());
-        instructor. setPassword(hashPassword(password));
-        instructor.setDepartment(department);
+            Instructor instructor = new Instructor();
+            instructor.setInstructorNumber(instructorNumber);
+            instructor.setFirstName(firstName.trim());
+            instructor.setLastName(lastName != null ? lastName.trim() : "");
+            instructor.setEmail(email.trim().toLowerCase());
+            instructor.setPassword(hashPassword(password));
+            instructor.setTitle(title);
+            instructor.setDepartment(department);
 
-        boolean saved = instructorDAO.save(instructor);
+            int instructorId = instructorDAO.create(instructor);
 
-        if (saved) {
-            return LoginResult. success(instructor, LoginResult.UserType. INSTRUCTOR);
-        } else {
-            return LoginResult.failure("Kayıt sırasında bir hata oluştu");
+            if (instructorId > 0) {
+                instructor.setInstructorId(instructorId);
+                return LoginResult.success(instructor, LoginResult.UserType.INSTRUCTOR);
+            } else {
+                return LoginResult.failure("Kayıt sırasında bir hata oluştu");
+            }
+        } catch (SQLException e) {
+            return LoginResult.failure("Veritabanı hatası: " + e.getMessage());
         }
     }
 
     /**
      * Şifre değiştirme
+     * NOT: Bu özellik için DAO'ya updatePassword metodu eklenmeli
      */
     public boolean changePassword(int userId, String oldPassword, 
                                    String newPassword, boolean isStudent) {
@@ -161,24 +183,32 @@ public class AuthService {
             return false;
         }
 
-        if (isStudent) {
-            Student student = studentDAO.findById(userId);
-            if (student == null) {
-                return false;
+        try {
+            if (isStudent) {
+                Student student = studentDAO.findById(userId);
+                if (student == null) {
+                    return false;
+                }
+                if (!verifyPassword(oldPassword, student.getPassword())) {
+                    return false;
+                }
+                // Şifre güncelleme: Student nesnesini güncelleyip update çağır
+                student.setPassword(hashPassword(newPassword));
+                return studentDAO.update(student);
+            } else {
+                Instructor instructor = instructorDAO.findById(userId);
+                if (instructor == null) {
+                    return false;
+                }
+                if (!verifyPassword(oldPassword, instructor.getPassword())) {
+                    return false;
+                }
+                // Şifre güncelleme: Instructor nesnesini güncelleyip update çağır
+                instructor.setPassword(hashPassword(newPassword));
+                return instructorDAO.update(instructor);
             }
-            if (!verifyPassword(oldPassword, student. getPassword())) {
-                return false;
-            }
-            return studentDAO.updatePassword(userId, hashPassword(newPassword));
-        } else {
-            Instructor instructor = instructorDAO. findById(userId);
-            if (instructor == null) {
-                return false;
-            }
-            if (!verifyPassword(oldPassword, instructor. getPassword())) {
-                return false;
-            }
-            return instructorDAO. updatePassword(userId, hashPassword(newPassword));
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -204,7 +234,7 @@ public class AuthService {
      * Email formatı kontrolü
      */
     private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@(. +)$";
-        return email. matches(emailRegex);
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        return email.matches(emailRegex);
     }
 }

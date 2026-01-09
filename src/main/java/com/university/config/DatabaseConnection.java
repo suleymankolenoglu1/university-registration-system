@@ -12,9 +12,12 @@ public class DatabaseConnection {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl("jdbc:postgresql://localhost:5432/university_registration");
         config.setUsername("postgres");
-        config.setPassword(""); // Şifreni buraya yaz
+        config.setPassword("124134");
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
+        config.setConnectionTimeout(30000);
+        config.setIdleTimeout(600000);
+        config.setMaxLifetime(1800000);
         
         dataSource = new HikariDataSource(config);
     }

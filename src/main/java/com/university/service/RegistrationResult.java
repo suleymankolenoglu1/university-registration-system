@@ -9,6 +9,7 @@ public enum RegistrationResult {
     ADDED_TO_WAITLIST("Bekleme listesine eklendiniz"),
     INVALID_SECTION("Geçersiz ders bölümü"),
     STUDENT_NOT_FOUND("Öğrenci bulunamadı"),
+    CREDIT_LIMIT_EXCEEDED("Dönemlik kredi limiti (30 AKTS) aşıldı"),
     ERROR("Bir hata oluştu");
 
     private final String message;

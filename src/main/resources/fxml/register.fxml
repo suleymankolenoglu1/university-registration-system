@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.university.controller.RegisterController" 
+            style="-fx-background-color: white;">
+    
+    <!-- ÜST YEŞİL BANNER -->
+    <top>
+        <VBox style="-fx-background-color: #4CAF50;">
+            <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
+                <Label text="📝" style="-fx-font-size: 42px;"/>
+                <VBox alignment="CENTER">
+                    <Label text="Üniversite Ders Kayıt Sistemi" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    <Label text="Yeni Hesap Oluştur" style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                </VBox>
+            </HBox>
+            <HBox style="-fx-background-color: #388E3C; -fx-min-height: 4;"/>
+        </VBox>
+    </top>
+    
+    <!-- ANA İÇERİK -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: white; -fx-background-color: white;">
+            <VBox alignment="CENTER" spacing="25" style="-fx-background-color: white; -fx-padding: 30;">
+                
+                <!-- Kayıt Türü Başlık -->
+                <Label text="Kayıt Bilgileri" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                
+                <!-- Kullanıcı Tipi -->
+                <HBox alignment="CENTER" spacing="30">
+                    <RadioButton fx:id="studentRadio" text="👨‍🎓 Öğrenci" selected="true" style="-fx-font-size: 14px;">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="userTypeGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="instructorRadio" text="👨‍🏫 Öğretim Elemanı" toggleGroup="$userTypeGroup" style="-fx-font-size: 14px;"/>
+                </HBox>
+                
+                <!-- Form Alanları - Direkt Beyaz Üzerinde -->
+                <VBox spacing="15" alignment="CENTER" maxWidth="600">
+                    
+                    <!-- Ad Soyad -->
+                    <HBox spacing="20" alignment="CENTER">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Ad" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <TextField fx:id="firstNameField" promptText="Adınız" 
+                                       style="-fx-padding: 12; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Soyad" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <TextField fx:id="lastNameField" promptText="Soyadınız" 
+                                       style="-fx-padding: 12; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;"/>
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Numara ve Bölüm -->
+                    <HBox spacing="20" alignment="CENTER">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Öğrenci/Personel No" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <TextField fx:id="numberField" promptText="2021001001" 
+                                       style="-fx-padding: 12; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Bölüm" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <ComboBox fx:id="departmentCombo" promptText="Seçiniz" maxWidth="Infinity"
+                                      style="-fx-background-color: #f5f5f5; -fx-background-radius: 8;"/>
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Email -->
+                    <VBox spacing="5">
+                        <Label text="E-posta" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <TextField fx:id="emailField" promptText="ornek@uni.edu.tr" 
+                                   style="-fx-padding: 12; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;"/>
+                    </VBox>
+                    
+                    <!-- Şifre -->
+                    <HBox spacing="20" alignment="CENTER">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Şifre" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <PasswordField fx:id="passwordField" promptText="En az 6 karakter" 
+                                           style="-fx-padding: 12; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Şifre Tekrar" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <PasswordField fx:id="confirmPasswordField" promptText="Tekrar girin" 
+                                           style="-fx-padding: 12; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;"/>
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Öğrenci için sınıf -->
+                    <HBox fx:id="semesterBox" spacing="20" alignment="CENTER_LEFT">
+                        <VBox spacing="5">
+                            <Label text="Sınıf" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <ComboBox fx:id="semesterCombo" promptText="Sınıf seçin" prefWidth="200"
+                                      style="-fx-background-color: #f5f5f5; -fx-background-radius: 8;"/>
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Öğretim elemanı için ünvan -->
+                    <HBox fx:id="titleBox" spacing="20" alignment="CENTER_LEFT" visible="false" managed="false">
+                        <VBox spacing="5">
+                            <Label text="Ünvan" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <ComboBox fx:id="titleCombo" promptText="Ünvan seçin" prefWidth="200"
+                                      style="-fx-background-color: #f5f5f5; -fx-background-radius: 8;"/>
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Hata Mesajı -->
+                    <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" visible="false" managed="false"/>
+                </VBox>
+                
+                <!-- PDF Yükleme - Yeşil Buton -->
+                <VBox spacing="10" alignment="CENTER">
+                    <Label text="📄 Öğrenci/Personel Belgesi (PDF)" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                    <HBox spacing="15" alignment="CENTER">
+                        <Button fx:id="uploadButton" text="📁 Dosya Seç" onAction="#handleFileUpload" 
+                                styleClass="green-button" prefWidth="150" prefHeight="45"/>
+                        <Label fx:id="fileNameLabel" text="Henüz dosya seçilmedi" style="-fx-text-fill: #666; -fx-font-size: 13px;"/>
+                    </HBox>
+                </VBox>
+                
+                <!-- Butonlar - Yeşil Grid Tarzı -->
+                <HBox alignment="CENTER" spacing="20">
+                    <Button text="✅ Kayıt Ol" onAction="#handleRegister" 
+                            styleClass="green-button" prefWidth="180" prefHeight="50"/>
+                    <Button text="← Giriş Sayfası" onAction="#goToLogin" 
+                            styleClass="green-button" prefWidth="180" prefHeight="50"/>
+                </HBox>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

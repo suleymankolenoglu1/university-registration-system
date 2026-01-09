@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.university.controller.LoginController" 
+            style="-fx-background-color: white;">
+    
+    <!-- ÜST YEŞİL BANNER -->
+    <top>
+        <VBox style="-fx-background-color: #4CAF50;">
+            <HBox alignment="CENTER" spacing="15" style="-fx-padding: 25;">
+                <Label text="🎓" style="-fx-font-size: 48px;"/>
+                <VBox alignment="CENTER">
+                    <Label text="Üniversite Ders Kayıt Sistemi" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    <Label text="Akıllı Kayıt ve Program Yönetimi" style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                </VBox>
+            </HBox>
+            <HBox style="-fx-background-color: #388E3C; -fx-min-height: 4;"/>
+        </VBox>
+    </top>
+    
+    <!-- ANA İÇERİK -->
+    <center>
+        <VBox alignment="CENTER" spacing="30" style="-fx-background-color: white; -fx-padding: 40;">
+            
+            <!-- Giriş Türü Başlık -->
+            <Label text="Giriş Yap" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+            
+            <!-- Kullanıcı Tipi Butonları -->
+            <HBox alignment="CENTER" spacing="30">
+                <RadioButton fx:id="studentRadio" text="👨‍🎓 Öğrenci Girişi" selected="true" style="-fx-font-size: 14px;">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="userTypeGroup"/>
+                    </toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="instructorRadio" text="👨‍🏫 Akademik Giriş" toggleGroup="$userTypeGroup" style="-fx-font-size: 14px;"/>
+            </HBox>
+            
+            <!-- Form Alanları - Direkt Beyaz Üzerinde -->
+            <VBox spacing="15" alignment="CENTER" maxWidth="400">
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="E-posta" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                    <TextField fx:id="emailField" promptText="ornek@uni.edu.tr" prefWidth="400"
+                               style="-fx-padding: 12; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;"/>
+                </VBox>
+                
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Şifre" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                    <PasswordField fx:id="passwordField" promptText="••••••••" prefWidth="400"
+                                   style="-fx-padding: 12; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;"/>
+                </VBox>
+                
+                <!-- Hata Mesajı -->
+                <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" visible="false" managed="false"/>
+            </VBox>
+            
+            <!-- Butonlar - Yeşil Grid Tarzı -->
+            <HBox alignment="CENTER" spacing="20">
+                <Button fx:id="loginButton" text="🔐 Giriş Yap" onAction="#handleLogin" 
+                        styleClass="green-button" prefWidth="180" prefHeight="50"/>
+                <Button fx:id="registerButton" text="📝 Kayıt Ol" onAction="#handleRegister" 
+                        styleClass="green-button" prefWidth="180" prefHeight="50"/>
+            </HBox>
+            
+            <!-- Alt Bilgi -->
+            <Label text="© 2026 Üniversite Kayıt Sistemi" style="-fx-text-fill: #999; -fx-font-size: 11px; -fx-padding: 20 0 0 0;"/>
+        </VBox>
+    </center>
+    
+</BorderPane>

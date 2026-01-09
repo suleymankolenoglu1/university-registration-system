@@ -221,12 +221,20 @@ public class AuthService {
 
     /**
      * Şifre doğrulama
+     * Hem BCrypt hash hem de düz metin şifreleri destekler (geçiş dönemi için)
      */
     private boolean verifyPassword(String plainPassword, String hashedPassword) {
         try {
-            return BCrypt.checkpw(plainPassword, hashedPassword);
+            // BCrypt hash mi kontrol et ($2a$, $2b$, $2y$ ile başlar)
+            if (hashedPassword.startsWith("$2")) {
+                return BCrypt.checkpw(plainPassword, hashedPassword);
+            } else {
+                // Düz metin şifre karşılaştırması (eski veriler için)
+                return plainPassword.equals(hashedPassword);
+            }
         } catch (Exception e) {
-            return false;
+            // BCrypt hatası durumunda düz metin dene
+            return plainPassword.equals(hashedPassword);
         }
     }
 

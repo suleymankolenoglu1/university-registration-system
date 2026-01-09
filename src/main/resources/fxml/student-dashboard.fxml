@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.collections.FXCollections?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.university.controller.StudentDashboardController" style="-fx-background-color: white;">
+    
+    <!-- ÜST HEADER - Yeşil Banner -->
+    <top>
+        <VBox style="-fx-background-color: #4CAF50;">
+            <!-- Logo ve Başlık -->
+            <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
+                <Label text="🎓" style="-fx-font-size: 42px;"/>
+                <VBox alignment="CENTER">
+                    <Label text="Üniversite Ders Kayıt Sistemi" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    <Label text="Öğrenci Paneli" style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                </VBox>
+                <!-- Sağ tarafta sınıf bilgisi -->
+                <Region HBox.hgrow="ALWAYS"/>
+                <VBox alignment="CENTER_RIGHT" style="-fx-padding: 0 20 0 0;">
+                    <Label fx:id="studentDeptLabel" text="Bölüm" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                    <Label fx:id="studentInfoLabel" text="Dönem" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                </VBox>
+            </HBox>
+            <!-- Alt çizgi -->
+            <HBox style="-fx-background-color: #388E3C; -fx-min-height: 4;"/>
+        </VBox>
+    </top>
+    
+    <!-- ANA İÇERİK -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: white; -fx-background-color: white;">
+            <VBox spacing="30" alignment="TOP_CENTER" style="-fx-background-color: white; -fx-padding: 40;">
+                
+                <!-- Kullanıcı Bilgisi -->
+                <VBox alignment="CENTER" spacing="5">
+                    <Label fx:id="studentNameLabel" text="Hoş Geldiniz" style="-fx-font-size: 16px; -fx-text-fill: #333;"/>
+                    <Label fx:id="studentDeptLabel" text="Bölüm" style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
+                </VBox>
+                
+                <!-- Öğrenci İşlemleri Başlık -->
+                <Label text="Öğrenci İşlemleri" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                
+                <!-- Buton Grid - İlk Satır -->
+                <HBox spacing="20" alignment="CENTER">
+                    <Button fx:id="menuDashboard" text="📊  Ana Sayfa" onAction="#showDashboard" 
+                            styleClass="green-button" prefWidth="220" prefHeight="55"/>
+                    <Button fx:id="menuCourses" text="📚  Ders Ara / Kayıt" onAction="#showCourseSearch" 
+                            styleClass="green-button" prefWidth="220" prefHeight="55"/>
+                    <Button fx:id="menuSchedule" text="📅  Haftalık Program" onAction="#showSchedule" 
+                            styleClass="green-button" prefWidth="220" prefHeight="55"/>
+                </HBox>
+                
+                <!-- Buton Grid - İkinci Satır -->
+                <HBox spacing="20" alignment="CENTER">
+                    <Button fx:id="menuEnrollments" text="✅  Kayıtlı Derslerim" onAction="#showEnrollments" 
+                            styleClass="green-button" prefWidth="220" prefHeight="55"/>
+                    <Button fx:id="menuWaitlist" text="⏳  Bekleme Listem" onAction="#showWaitlist" 
+                            styleClass="green-button" prefWidth="220" prefHeight="55"/>
+                    <Button text="🚪  Çıkış Yap" onAction="#handleLogout" 
+                            styleClass="green-button" prefWidth="220" prefHeight="55"/>
+                </HBox>
+                
+                <!-- Eğitim Bilgileri Başlık -->
+                <Label text="Eğitim Bilgilerim" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #4CAF50; -fx-padding: 20 0 0 0;"/>
+                
+                <!-- İstatistik Kartları - Yeşil Butonlar -->
+                <HBox spacing="20" alignment="CENTER">
+                    <VBox alignment="CENTER" styleClass="green-button" prefWidth="170" prefHeight="80" spacing="3">
+                        <Label fx:id="enrolledCountLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label text="Kayıtlı Ders" style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+                    </VBox>
+                    <VBox alignment="CENTER" styleClass="green-button" prefWidth="170" prefHeight="80" spacing="3">
+                        <Label fx:id="totalCreditsLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label text="Toplam Kredi" style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+                    </VBox>
+                    <VBox alignment="CENTER" style="-fx-background-color: #FF9800; -fx-background-radius: 8;" prefWidth="170" prefHeight="80" spacing="3">
+                        <Label fx:id="remainingCreditsLabel" text="30" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label text="Kalan Kredi" style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+                    </VBox>
+                    <VBox alignment="CENTER" styleClass="green-button" prefWidth="170" prefHeight="80" spacing="3">
+                        <Label fx:id="waitlistCountLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label text="Bekleme Listesi" style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+                    </VBox>
+                </HBox>
+                
+                <!-- Gizli elemanlar (eski uyumluluk için) -->
+                <Label fx:id="studentNumberLabel" visible="false" managed="false"/>
+                <Label fx:id="pageTitle" visible="false" managed="false"/>
+                <HBox fx:id="statsBox" visible="false" managed="false"/>
+                <TableView fx:id="enrolledCoursesTable" visible="false" managed="false">
+                    <columns>
+                        <TableColumn fx:id="colCourseCode" text="Ders Kodu"/>
+                        <TableColumn fx:id="colCourseName" text="Ders Adı"/>
+                        <TableColumn fx:id="colInstructor" text="Öğretim Elemanı"/>
+                        <TableColumn fx:id="colDay" text="Gün"/>
+                        <TableColumn fx:id="colTime" text="Saat"/>
+                        <TableColumn fx:id="colRoom" text="Derslik"/>
+                        <TableColumn fx:id="colCredits" text="Kredi"/>
+                        <TableColumn fx:id="colAction" text="İşlem"/>
+                    </columns>
+                </TableView>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

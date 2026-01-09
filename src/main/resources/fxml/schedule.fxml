@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.university.controller.ScheduleController" 
+            style="-fx-background-color: white;">
+    
+    <!-- ÜST YEŞİL BANNER -->
+    <top>
+        <VBox style="-fx-background-color: #4CAF50;">
+            <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
+                <Label text="📅" style="-fx-font-size: 42px;"/>
+                <VBox alignment="CENTER">
+                    <Label text="Haftalık Ders Programım" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    <Label fx:id="studentNameLabel" text="Öğrenci" style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                </VBox>
+                <!-- Sağ tarafta sınıf bilgisi -->
+                <Region HBox.hgrow="ALWAYS"/>
+                <VBox alignment="CENTER_RIGHT" style="-fx-padding: 0 20 0 0;">
+                    <Label fx:id="studentDeptLabel" text="Bölüm" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                    <Label fx:id="semesterInfoLabel" text="Dönem" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                </VBox>
+            </HBox>
+            <HBox style="-fx-background-color: #388E3C; -fx-min-height: 4;"/>
+        </VBox>
+    </top>
+    
+    <!-- ANA İÇERİK -->
+    <center>
+        <VBox spacing="20" style="-fx-background-color: white; -fx-padding: 25;">
+            
+            <!-- Navigasyon Butonları -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="🏠 Ana Sayfa" onAction="#goToDashboard" styleClass="green-button" prefWidth="150" prefHeight="40"/>
+                <Button text="📚 Ders Ara" onAction="#goToCourseSearch" styleClass="green-button" prefWidth="150" prefHeight="40"/>
+                <Button text="📅 Ders Programı" styleClass="green-button" prefWidth="150" prefHeight="40" style="-fx-background-color: #388E3C;"/>
+                <Button text="🚪 Çıkış" onAction="#handleLogout" styleClass="green-button" prefWidth="150" prefHeight="40"/>
+            </HBox>
+            
+            <!-- Program Grid -->
+            <GridPane fx:id="scheduleGrid" hgap="2" vgap="2" VBox.vgrow="ALWAYS" 
+                      style="-fx-background-color: #ddd; -fx-padding: 2;">
+                <!-- Başlık satırı -->
+                <Label text="Saat" GridPane.columnIndex="0" GridPane.rowIndex="0" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="Pazartesi" GridPane.columnIndex="1" GridPane.rowIndex="0" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="Salı" GridPane.columnIndex="2" GridPane.rowIndex="0" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="Çarşamba" GridPane.columnIndex="3" GridPane.rowIndex="0" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="Perşembe" GridPane.columnIndex="4" GridPane.rowIndex="0" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="Cuma" GridPane.columnIndex="5" GridPane.rowIndex="0" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       maxWidth="Infinity" maxHeight="Infinity"/>
+                
+                <!-- Saat dilimleri -->
+                <Label text="09:00-10:00" GridPane.columnIndex="0" GridPane.rowIndex="1" 
+                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="10:00-11:00" GridPane.columnIndex="0" GridPane.rowIndex="2" 
+                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="11:00-12:00" GridPane.columnIndex="0" GridPane.rowIndex="3" 
+                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="12:00-13:00" GridPane.columnIndex="0" GridPane.rowIndex="4" 
+                       style="-fx-background-color: #e8f5e9; -fx-padding: 8; -fx-alignment: CENTER; -fx-text-fill: #666;" maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="13:00-14:00" GridPane.columnIndex="0" GridPane.rowIndex="5" 
+                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="14:00-15:00" GridPane.columnIndex="0" GridPane.rowIndex="6" 
+                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="15:00-16:00" GridPane.columnIndex="0" GridPane.rowIndex="7" 
+                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                <Label text="16:00-17:00" GridPane.columnIndex="0" GridPane.rowIndex="8" 
+                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                
+                <!-- Column constraints -->
+                <columnConstraints>
+                    <ColumnConstraints minWidth="90" prefWidth="100"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="130"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="130"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="130"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="130"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="130"/>
+                </columnConstraints>
+                
+                <!-- Row constraints -->
+                <rowConstraints>
+                    <RowConstraints minHeight="45" prefHeight="45"/>
+                    <RowConstraints vgrow="ALWAYS" minHeight="55"/>
+                    <RowConstraints vgrow="ALWAYS" minHeight="55"/>
+                    <RowConstraints vgrow="ALWAYS" minHeight="55"/>
+                    <RowConstraints vgrow="ALWAYS" minHeight="40"/>
+                    <RowConstraints vgrow="ALWAYS" minHeight="55"/>
+                    <RowConstraints vgrow="ALWAYS" minHeight="55"/>
+                    <RowConstraints vgrow="ALWAYS" minHeight="55"/>
+                    <RowConstraints vgrow="ALWAYS" minHeight="55"/>
+                </rowConstraints>
+            </GridPane>
+            
+            <!-- Renk Açıklaması -->
+            <HBox spacing="30" alignment="CENTER">
+                <HBox spacing="8" alignment="CENTER">
+                    <Label style="-fx-background-color: #4CAF50; -fx-padding: 8 15; -fx-background-radius: 5;" text="     "/>
+                    <Label text="Kayıtlı Ders" style="-fx-font-size: 13px;"/>
+                </HBox>
+                <HBox spacing="8" alignment="CENTER">
+                    <Label style="-fx-background-color: #e8f5e9; -fx-padding: 8 15; -fx-background-radius: 5;" text="     "/>
+                    <Label text="Öğle Arası" style="-fx-font-size: 13px;"/>
+                </HBox>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>

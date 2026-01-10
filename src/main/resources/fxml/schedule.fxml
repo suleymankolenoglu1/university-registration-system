@@ -40,45 +40,45 @@
             </HBox>
             
             <!-- Program Grid -->
-            <GridPane fx:id="scheduleGrid" hgap="2" vgap="2" VBox.vgrow="ALWAYS" 
-                      style="-fx-background-color: #ddd; -fx-padding: 2;">
+            <GridPane fx:id="scheduleGrid" hgap="0" vgap="0" VBox.vgrow="ALWAYS" 
+                      style="-fx-background-color: #999; -fx-padding: 1;">
                 <!-- Başlık satırı -->
                 <Label text="Saat" GridPane.columnIndex="0" GridPane.rowIndex="0" 
-                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER; -fx-border-color: #388E3C; -fx-border-width: 0 1 1 0;" 
                        maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="Pazartesi" GridPane.columnIndex="1" GridPane.rowIndex="0" 
-                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER; -fx-border-color: #388E3C; -fx-border-width: 0 1 1 0;" 
                        maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="Salı" GridPane.columnIndex="2" GridPane.rowIndex="0" 
-                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER; -fx-border-color: #388E3C; -fx-border-width: 0 1 1 0;" 
                        maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="Çarşamba" GridPane.columnIndex="3" GridPane.rowIndex="0" 
-                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER; -fx-border-color: #388E3C; -fx-border-width: 0 1 1 0;" 
                        maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="Perşembe" GridPane.columnIndex="4" GridPane.rowIndex="0" 
-                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER; -fx-border-color: #388E3C; -fx-border-width: 0 1 1 0;" 
                        maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="Cuma" GridPane.columnIndex="5" GridPane.rowIndex="0" 
-                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER;" 
+                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: CENTER; -fx-border-color: #388E3C; -fx-border-width: 0 0 1 0;" 
                        maxWidth="Infinity" maxHeight="Infinity"/>
                 
-                <!-- Saat dilimleri -->
+                <!-- Saat dilimleri - Her biri çerçeveli -->
                 <Label text="09:00-10:00" GridPane.columnIndex="0" GridPane.rowIndex="1" 
-                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                       style="-fx-background-color: #f5f5f5; -fx-padding: 8; -fx-alignment: CENTER; -fx-border-color: #999; -fx-border-width: 0 1 1 0; -fx-font-weight: bold;" maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="10:00-11:00" GridPane.columnIndex="0" GridPane.rowIndex="2" 
-                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                       style="-fx-background-color: #f5f5f5; -fx-padding: 8; -fx-alignment: CENTER; -fx-border-color: #999; -fx-border-width: 0 1 1 0; -fx-font-weight: bold;" maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="11:00-12:00" GridPane.columnIndex="0" GridPane.rowIndex="3" 
-                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                       style="-fx-background-color: #f5f5f5; -fx-padding: 8; -fx-alignment: CENTER; -fx-border-color: #999; -fx-border-width: 0 1 1 0; -fx-font-weight: bold;" maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="12:00-13:00" GridPane.columnIndex="0" GridPane.rowIndex="4" 
-                       style="-fx-background-color: #e8f5e9; -fx-padding: 8; -fx-alignment: CENTER; -fx-text-fill: #666;" maxWidth="Infinity" maxHeight="Infinity"/>
+                       style="-fx-background-color: #e8f5e9; -fx-padding: 8; -fx-alignment: CENTER; -fx-border-color: #999; -fx-border-width: 0 1 1 0; -fx-text-fill: #666; -fx-font-weight: bold;" maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="13:00-14:00" GridPane.columnIndex="0" GridPane.rowIndex="5" 
-                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                       style="-fx-background-color: #f5f5f5; -fx-padding: 8; -fx-alignment: CENTER; -fx-border-color: #999; -fx-border-width: 0 1 1 0; -fx-font-weight: bold;" maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="14:00-15:00" GridPane.columnIndex="0" GridPane.rowIndex="6" 
-                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                       style="-fx-background-color: #f5f5f5; -fx-padding: 8; -fx-alignment: CENTER; -fx-border-color: #999; -fx-border-width: 0 1 1 0; -fx-font-weight: bold;" maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="15:00-16:00" GridPane.columnIndex="0" GridPane.rowIndex="7" 
-                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                       style="-fx-background-color: #f5f5f5; -fx-padding: 8; -fx-alignment: CENTER; -fx-border-color: #999; -fx-border-width: 0 1 1 0; -fx-font-weight: bold;" maxWidth="Infinity" maxHeight="Infinity"/>
                 <Label text="16:00-17:00" GridPane.columnIndex="0" GridPane.rowIndex="8" 
-                       style="-fx-background-color: white; -fx-padding: 8; -fx-alignment: CENTER;" maxWidth="Infinity" maxHeight="Infinity"/>
+                       style="-fx-background-color: #f5f5f5; -fx-padding: 8; -fx-alignment: CENTER; -fx-border-color: #999; -fx-border-width: 0 1 0 0; -fx-font-weight: bold;" maxWidth="Infinity" maxHeight="Infinity"/>
                 
                 <!-- Column constraints -->
                 <columnConstraints>

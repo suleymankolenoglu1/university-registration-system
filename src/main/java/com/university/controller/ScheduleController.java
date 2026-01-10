@@ -85,7 +85,12 @@ public class ScheduleController implements Initializable {
                 if (row == 4) continue; // Öğle arası
                 
                 VBox emptyCell = new VBox();
-                emptyCell.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-width: 1; -fx-min-height: 55;");
+                emptyCell.setStyle(
+                    "-fx-background-color: white;" +
+                    "-fx-border-color: #bbb #ddd #bbb #ddd;" +
+                    "-fx-border-width: 1 1 1 1;" +
+                    "-fx-min-height: 55;"
+                );
                 emptyCell.setMaxWidth(Double.MAX_VALUE);
                 emptyCell.setMaxHeight(Double.MAX_VALUE);
                 GridPane.setHgrow(emptyCell, Priority.ALWAYS);
@@ -95,13 +100,17 @@ public class ScheduleController implements Initializable {
             
             // Öğle arası
             VBox lunchCell = new VBox();
-            lunchCell.setStyle("-fx-background-color: #e8f5e9; -fx-border-color: #ddd; -fx-border-width: 1;");
+            lunchCell.setStyle(
+                "-fx-background-color: #e8f5e9;" +
+                "-fx-border-color: #888 #ddd #888 #ddd;" +
+                "-fx-border-width: 2 1 2 1;"
+            );
             lunchCell.setMaxWidth(Double.MAX_VALUE);
             lunchCell.setMaxHeight(Double.MAX_VALUE);
             scheduleGrid.add(lunchCell, col, 4);
         }
     }
-    
+
     private void loadSchedule() {
         if (currentStudent == null) return;
         
@@ -123,13 +132,15 @@ public class ScheduleController implements Initializable {
                 int rowSpan = endRow - startRow;
                 if (rowSpan <= 0) rowSpan = 1;
                 
-                // Ders kartı oluştur
-                VBox courseCard = createCourseCard(
+                // Her saat için ayrı kart oluştur (çizgilerle ayrılmış)
+                VBox courseCard = createMultiHourCourseCard(
                     course != null ? course.getCourseCode() : "",
                     course != null ? course.getCourseName() : "",
                     instructor != null ? instructor.getFullName() : "",
                     room != null ? room.getRoomCode() : "TBA",
-                    section.getStartTime() + "-" + section.getEndTime()
+                    section.getStartTime(),
+                    section.getEndTime(),
+                    rowSpan
                 );
                 
                 // Grid'e ekle
@@ -149,34 +160,67 @@ public class ScheduleController implements Initializable {
         return 1;
     }
     
-    private VBox createCourseCard(String code, String name, String instructor, String room, String time) {
-        VBox card = new VBox(3);
-        card.setStyle(
-            "-fx-background-color: #4CAF50;" +
-            "-fx-background-radius: 5;" +
-            "-fx-padding: 8;" +
-            "-fx-border-color: #388E3C;" +
-            "-fx-border-width: 0 0 0 4;" +
-            "-fx-border-radius: 5;"
-        );
-        card.setAlignment(Pos.TOP_LEFT);
-        card.setMaxWidth(Double.MAX_VALUE);
-        card.setMaxHeight(Double.MAX_VALUE);
+    
+
+/**
+ * Çok saatlik dersler için saatler arası çizgili kart oluşturur
+ */
+private VBox createMultiHourCourseCard(String code, String name, String instructor, 
+                                        String room, LocalTime startTime, LocalTime endTime, int hours) {
+    VBox mainCard = new VBox(0);
+    mainCard.setStyle(
+        "-fx-background-color: #4CAF50;" +
+        "-fx-background-radius: 5;" +
+        "-fx-border-color: #388E3C;" +
+        "-fx-border-width: 0 0 0 4;" +
+        "-fx-border-radius: 5;"
+    );
+    mainCard.setMaxWidth(Double.MAX_VALUE);
+    mainCard.setMaxHeight(Double.MAX_VALUE);
+    VBox.setVgrow(mainCard, Priority.ALWAYS);
+    
+    for (int i = 0; i < hours; i++) {
+        VBox hourCell = new VBox(2);
+        hourCell.setAlignment(Pos.CENTER);
+        hourCell.setStyle("-fx-padding: 6;");
+        hourCell.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(hourCell, Priority.ALWAYS);
         
+        // Her saatte ders kodu göster
         Label codeLabel = new Label(code);
         codeLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: white;");
         
+        // Her saatte ders adı göster
         Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: white;");
+        nameLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: white;");
         nameLabel.setWrapText(true);
+        nameLabel.setAlignment(Pos.CENTER);
         
+        // Oda bilgisi
         Label roomLabel = new Label("📍 " + room);
-        roomLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.9);");
+        roomLabel.setStyle("-fx-font-size: 9px; -fx-text-fill: rgba(255,255,255,0.85);");
         
-        card.getChildren().addAll(codeLabel, nameLabel, roomLabel);
+        hourCell.getChildren().addAll(codeLabel, nameLabel, roomLabel);
         
-        return card;
+        mainCard.getChildren().add(hourCell);
+        
+        // Saatler arası beyaz çizgi ekle (son saat hariç)
+        if (i < hours - 1) {
+            HBox separator = new HBox();
+            separator.setStyle(
+                "-fx-background-color: rgba(255,255,255,0.6);" +
+                "-fx-min-height: 2;" +
+                "-fx-max-height: 2;"
+            );
+            separator.setMaxWidth(Double.MAX_VALUE);
+            mainCard.getChildren().add(separator);
+        }
     }
+    
+    return mainCard;
+}
+
+// ...existing code...
     
     @FXML
     private void goToDashboard() {

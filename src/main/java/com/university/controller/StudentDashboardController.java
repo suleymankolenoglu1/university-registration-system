@@ -256,19 +256,119 @@ public class StudentDashboardController implements Initializable {
         }
     }
     
-    @FXML
-    private void showEnrollments() {
-        setActiveMenu(menuEnrollments);
-        pageTitle.setText("✅ Kayıtlı Derslerim");
-        // Dashboard'daki tablo zaten kayıtlı dersleri gösteriyor
-    }
     
-    @FXML
-    private void showWaitlist() {
-        setActiveMenu(menuWaitlist);
-        pageTitle.setText("⏳ Bekleme Listem");
-        loadWaitlistView();
+
+@FXML
+private void showEnrollments() {
+    try {
+        // Kayıtlı dersleri gösteren bir Alert/Dialog aç
+        List<Section> enrolledSections = registrationService.getEnrolledSections(currentStudent.getStudentId());
+        
+        StringBuilder content = new StringBuilder();
+        content.append("📚 Kayıtlı Dersleriniz:\n\n");
+        
+        if (enrolledSections.isEmpty()) {
+            content.append("Henüz kayıtlı dersiniz bulunmamaktadır.");
+        } else {
+            int totalCredits = 0;
+            for (Section section : enrolledSections) {
+                Course course = courseDAO.findById(section.getCourseId());
+                Instructor instructor = instructorDAO.findById(section.getInstructorId());
+                Room room = section.getRoomId() != null ? roomDAO.findById(section.getRoomId()) : null;
+                
+                if (course != null) {
+                    totalCredits += course.getCredits();
+                    content.append("• ").append(course.getCourseCode())
+                           .append(" - ").append(course.getCourseName())
+                           .append("\n   📅 ").append(section.getDayOfWeek())
+                           .append(" ⏰ ").append(section.getStartTime()).append("-").append(section.getEndTime())
+                           .append(" 🏫 ").append(room != null ? room.getRoomCode() : "TBA")
+                           .append(" 👨‍🏫 ").append(instructor != null ? instructor.getFullName() : "Belirtilmemiş")
+                           .append(" (").append(course.getCredits()).append(" Kredi)")
+                           .append("\n\n");
+                }
+            }
+            content.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+            content.append("Toplam: ").append(enrolledSections.size()).append(" ders, ")
+                   .append(totalCredits).append(" kredi");
+        }
+        
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Kayıtlı Derslerim");
+        alert.setHeaderText("✅ Kayıtlı Derslerim");
+        alert.getDialogPane().setMinWidth(500);
+        
+        TextArea textArea = new TextArea(content.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setPrefHeight(400);
+        textArea.setStyle("-fx-font-size: 14px;");
+        
+        alert.getDialogPane().setContent(textArea);
+        alert.showAndWait();
+        
+    } catch (SQLException e) {
+        showAlert(Alert.AlertType.ERROR, "Hata", "Kayıtlı dersler yüklenirken hata: " + e.getMessage());
     }
+}
+
+//
+    
+   
+
+@FXML
+private void showWaitlist() {
+    try {
+        List<WaitingList> waitlist = waitingListDAO.findByStudent(currentStudent.getStudentId());
+        
+        StringBuilder content = new StringBuilder();
+        content.append("⏳ Bekleme Listenizdeki Dersler:\n\n");
+        
+        if (waitlist.isEmpty()) {
+            content.append("Bekleme listenizde ders bulunmamaktadır.");
+        } else {
+            int sira = 1;
+            for (WaitingList item : waitlist) {
+                Section section = registrationService.getSectionById(item.getSectionId());
+                Course course = section != null ? courseDAO.findById(section.getCourseId()) : null;
+                Instructor instructor = section != null ? instructorDAO.findById(section.getInstructorId()) : null;
+                
+                if (course != null && section != null) {
+                    content.append(sira).append(". ").append(course.getCourseCode())
+                           .append(" - ").append(course.getCourseName())
+                           .append("\n   📅 ").append(section.getDayOfWeek())
+                           .append(" ⏰ ").append(section.getStartTime()).append("-").append(section.getEndTime())
+                           .append(" 👨‍🏫 ").append(instructor != null ? instructor.getFullName() : "Belirtilmemiş")
+                           .append("\n   📊 Sıra: ").append(item.getPosition())
+                           .append(" | Eklenme: ").append(item.getAddedDate())
+                           .append("\n\n");
+                    sira++;
+                }
+            }
+            content.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+            content.append("Toplam: ").append(waitlist.size()).append(" ders bekleme listesinde");
+        }
+        
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Bekleme Listem");
+        alert.setHeaderText("⏳ Bekleme Listem");
+        alert.getDialogPane().setMinWidth(500);
+        
+        TextArea textArea = new TextArea(content.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setPrefHeight(400);
+        textArea.setStyle("-fx-font-size: 14px;");
+        
+        alert.getDialogPane().setContent(textArea);
+        alert.showAndWait();
+        
+    } catch (SQLException e) {
+        showAlert(Alert.AlertType.ERROR, "Hata", "Bekleme listesi yüklenirken hata: " + e.getMessage());
+    }
+}
+
+
     
     private void loadWaitlistView() {
         // Bekleme listesi görünümü yükle

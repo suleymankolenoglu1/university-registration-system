@@ -333,4 +333,9 @@ public class RegistrationService {
     public int getRemainingCredits(int studentId) {
         return MAX_CREDITS_PER_SEMESTER - getCurrentSemesterCredits(studentId);
     }
+
+    public Section getSectionById(int sectionId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSectionById'");
+    }
 }

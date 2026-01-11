@@ -179,8 +179,7 @@ public class StudentDashboardController implements Initializable {
                         instructor != null ? instructor.getFullName() : "Belirtilmemiş",
                         section.getDayOfWeek(),
                         section.getStartTime() + " - " + section.getEndTime(),
-                        room != null ? room.getRoomCode() : "TBA",
-                        String.valueOf(course.getCredits())
+                        room != null ? room.getRoomCode() : "TBA"
                     );
                     rows.add(row);
                 }
@@ -258,59 +257,158 @@ public class StudentDashboardController implements Initializable {
     
     
 
+// ...existing code...
+
 @FXML
 private void showEnrollments() {
     try {
-        // Kayıtlı dersleri gösteren bir Alert/Dialog aç
         List<Section> enrolledSections = registrationService.getEnrolledSections(currentStudent.getStudentId());
         
-        StringBuilder content = new StringBuilder();
-        content.append("📚 Kayıtlı Dersleriniz:\n\n");
-        
         if (enrolledSections.isEmpty()) {
-            content.append("Henüz kayıtlı dersiniz bulunmamaktadır.");
-        } else {
-            int totalCredits = 0;
-            for (Section section : enrolledSections) {
-                Course course = courseDAO.findById(section.getCourseId());
-                Instructor instructor = instructorDAO.findById(section.getInstructorId());
-                Room room = section.getRoomId() != null ? roomDAO.findById(section.getRoomId()) : null;
-                
-                if (course != null) {
-                    totalCredits += course.getCredits();
-                    content.append("• ").append(course.getCourseCode())
-                           .append(" - ").append(course.getCourseName())
-                           .append("\n   📅 ").append(section.getDayOfWeek())
-                           .append(" ⏰ ").append(section.getStartTime()).append("-").append(section.getEndTime())
-                           .append(" 🏫 ").append(room != null ? room.getRoomCode() : "TBA")
-                           .append(" 👨‍🏫 ").append(instructor != null ? instructor.getFullName() : "Belirtilmemiş")
-                           .append(" (").append(course.getCredits()).append(" Kredi)")
-                           .append("\n\n");
-                }
-            }
-            content.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-            content.append("Toplam: ").append(enrolledSections.size()).append(" ders, ")
-                   .append(totalCredits).append(" kredi");
+            showAlert(Alert.AlertType.INFORMATION, "Kayıtlı Derslerim", "Henüz kayıtlı dersiniz bulunmamaktadır.");
+            return;
         }
         
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Kayıtlı Derslerim");
-        alert.setHeaderText("✅ Kayıtlı Derslerim");
-        alert.getDialogPane().setMinWidth(500);
+        // Dialog oluştur
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Kayıtlı Derslerim");
+        dialog.setHeaderText("📚 Kayıtlı Dersleriniz (" + enrolledSections.size() + " ders)");
+        dialog.getDialogPane().setMinWidth(700);
+        dialog.getDialogPane().setMinHeight(400);
         
-        TextArea textArea = new TextArea(content.toString());
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-        textArea.setPrefHeight(400);
-        textArea.setStyle("-fx-font-size: 14px;");
+        // Tablo oluştur
+        TableView<EnrolledCourseRow> table = new TableView<>();
+        table.setPrefHeight(350);
         
-        alert.getDialogPane().setContent(textArea);
-        alert.showAndWait();
+        TableColumn<EnrolledCourseRow, String> codeCol = new TableColumn<>("Ders Kodu");
+        codeCol.setCellValueFactory(new PropertyValueFactory<>("courseCode"));
+        codeCol.setPrefWidth(90);
+        
+        TableColumn<EnrolledCourseRow, String> nameCol = new TableColumn<>("Ders Adı");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("courseName"));
+        nameCol.setPrefWidth(180);
+        
+        TableColumn<EnrolledCourseRow, String> dayCol = new TableColumn<>("Gün");
+        dayCol.setCellValueFactory(new PropertyValueFactory<>("day"));
+        dayCol.setPrefWidth(90);
+        
+        TableColumn<EnrolledCourseRow, String> timeCol = new TableColumn<>("Saat");
+        timeCol.setCellValueFactory(new PropertyValueFactory<>("time"));
+        timeCol.setPrefWidth(100);
+        
+        TableColumn<EnrolledCourseRow, String> roomCol = new TableColumn<>("Derslik");
+        roomCol.setCellValueFactory(new PropertyValueFactory<>("room"));
+        roomCol.setPrefWidth(70);
+        
+        TableColumn<EnrolledCourseRow, String> creditsCol = new TableColumn<>("Kredi");
+        creditsCol.setCellValueFactory(new PropertyValueFactory<>("credits"));
+        creditsCol.setPrefWidth(50);
+        
+        // Ders Bırak butonu
+        TableColumn<EnrolledCourseRow, Void> actionCol = new TableColumn<>("İşlem");
+        actionCol.setPrefWidth(100);
+        actionCol.setCellFactory(param -> new TableCell<>() {
+            private final Button dropBtn = new Button("Bırak");
+            {
+                dropBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 5 15; -fx-background-radius: 5;");
+                dropBtn.setOnAction(event -> {
+                    EnrolledCourseRow row = getTableView().getItems().get(getIndex());
+                    
+                    // Onay al
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirm.setTitle("Ders Bırakma");
+                    confirm.setHeaderText("Dersi bırakmak istediğinize emin misiniz?");
+                    confirm.setContentText(row.getCourseCode() + " - " + row.getCourseName());
+                    
+                    if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                        // Dersi bırak
+                        boolean result = registrationService.dropCourse(
+                            currentStudent.getStudentId(), row.getSectionId());
+                        
+                        if (result) {
+    showAlert(Alert.AlertType.INFORMATION, "Başarılı", "Ders başarıyla bırakıldı.");
+    loadDashboardData();
+} else {
+    showAlert(Alert.AlertType.ERROR, "Hata", "Ders bırakılırken hata oluştu.");
+}
+                    }
+                });
+            }
+            
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : dropBtn);
+            }
+        });
+        
+        table.getColumns().addAll(codeCol, nameCol, dayCol, timeCol, roomCol, creditsCol, actionCol);
+        
+        // Verileri ekle
+        ObservableList<EnrolledCourseRow> data = FXCollections.observableArrayList();
+        int totalCredits = 0;
+        
+        for (Section section : enrolledSections) {
+            Course course = courseDAO.findById(section.getCourseId());
+            Room room = section.getRoomId() != null ? roomDAO.findById(section.getRoomId()) : null;
+            
+            if (course != null) {
+                totalCredits += course.getCredits();
+                data.add(new EnrolledCourseRow(
+                    section.getSectionId(),
+                    course.getCourseCode(),
+                    course.getCourseName(),
+                    section.getDayOfWeek(),
+                    section.getStartTime() + "-" + section.getEndTime(),
+                    room != null ? room.getRoomCode() : "TBA",
+                    String.valueOf(course.getCredits())
+                ));
+            }
+        }
+        
+        table.setItems(data);
+        
+        // Toplam kredi bilgisi
+        Label totalLabel = new Label("Toplam: " + enrolledSections.size() + " ders, " + totalCredits + " kredi");
+        totalLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+        
+        VBox content = new VBox(10, table, totalLabel);
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        
+        dialog.showAndWait();
         
     } catch (SQLException e) {
         showAlert(Alert.AlertType.ERROR, "Hata", "Kayıtlı dersler yüklenirken hata: " + e.getMessage());
     }
 }
+
+// Yardımcı sınıf - Kayıtlı ders satırı
+public static class EnrolledCourseRow {
+    private int sectionId;
+    private String courseCode, courseName, day, time, room, credits;
+    
+    public EnrolledCourseRow(int sectionId, String courseCode, String courseName, 
+                              String day, String time, String room, String credits) {
+        this.sectionId = sectionId;
+        this.courseCode = courseCode;
+        this.courseName = courseName;
+        this.day = day;
+        this.time = time;
+        this.room = room;
+        this.credits = credits;
+    }
+    
+    public int getSectionId() { return sectionId; }
+    public String getCourseCode() { return courseCode; }
+    public String getCourseName() { return courseName; }
+    public String getDay() { return day; }
+    public String getTime() { return time; }
+    public String getRoom() { return room; }
+    public String getCredits() { return credits; }
+}
+
+// ...existing code...
 
 //
     
@@ -413,36 +511,5 @@ private void showWaitlist() {
     
     // === TABLO ROW SINIFI ===
     
-    public static class EnrolledCourseRow {
-        private int sectionId;
-        private String courseCode;
-        private String courseName;
-        private String instructor;
-        private String day;
-        private String time;
-        private String room;
-        private String credits;
-        
-        public EnrolledCourseRow(int sectionId, String courseCode, String courseName, 
-                                  String instructor, String day, String time, String room, String credits) {
-            this.sectionId = sectionId;
-            this.courseCode = courseCode;
-            this.courseName = courseName;
-            this.instructor = instructor;
-            this.day = day;
-            this.time = time;
-            this.room = room;
-            this.credits = credits;
-        }
-        
-        // Getters
-        public int getSectionId() { return sectionId; }
-        public String getCourseCode() { return courseCode; }
-        public String getCourseName() { return courseName; }
-        public String getInstructor() { return instructor; }
-        public String getDay() { return day; }
-        public String getTime() { return time; }
-        public String getRoom() { return room; }
-        public String getCredits() { return credits; }
-    }
+    
 }

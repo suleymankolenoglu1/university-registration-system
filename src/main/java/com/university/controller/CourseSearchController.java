@@ -53,6 +53,7 @@ public class CourseSearchController implements Initializable {
     private CourseDAO courseDAO;
     private InstructorDAO instructorDAO;
     private RoomDAO roomDAO;
+    private WaitingListDAO waitingListDAO;
     
     private Student currentStudent;
     private ObservableList<CourseRow> allCourses = FXCollections.observableArrayList();
@@ -64,6 +65,7 @@ public class CourseSearchController implements Initializable {
         courseDAO = new CourseDAO();
         instructorDAO = new InstructorDAO();
         roomDAO = new RoomDAO();
+        waitingListDAO = new WaitingListDAO();
         
         currentStudent = LoginController.getCurrentStudent();
         
@@ -133,15 +135,24 @@ public class CourseSearchController implements Initializable {
                     setGraphic(null);
                 } else {
                     CourseRow row = getTableView().getItems().get(getIndex());
-                    if (row.isFull()) {
-                        enrollBtn.setText("Bekleme");
-                        enrollBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5;");
-                        enrollBtn.setDisable(false);
-                    } else if (row.isEnrolled()) {
+                    
+                    if (row.isEnrolled()) {
+                        // Önce kayıtlı mı kontrol et
                         enrollBtn.setText("Kayıtlı ✓");
                         enrollBtn.setStyle("-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5;");
                         enrollBtn.setDisable(true);
+                    } else if (row.isInWaitlist()) {
+                        // Bekleme listesinde mi kontrol et
+                        enrollBtn.setText("Beklemede ⏳");
+                        enrollBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5;");
+                        enrollBtn.setDisable(true);
+                    } else if (row.isFull()) {
+                        // Ders dolu mu kontrol et
+                        enrollBtn.setText("Bekleme Listesi");
+                        enrollBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5;");
+                        enrollBtn.setDisable(false);
                     } else {
+                        // Normal kayıt
                         enrollBtn.setText("Kayıt Ol");
                         enrollBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5;");
                         enrollBtn.setDisable(false);
@@ -176,6 +187,10 @@ public class CourseSearchController implements Initializable {
                 boolean isEnrolled = registrationService.isAlreadyEnrolled(
                     currentStudent.getStudentId(), section.getSectionId());
                 
+                // Bekleme listesinde mi kontrolü
+                boolean isInWaitlist = isStudentInWaitlist(
+                    currentStudent.getStudentId(), section.getSectionId());
+                
                 String capacityStr = section.getEnrolledCount() + "/" + section.getCapacity();
                 
                 CourseRow row = new CourseRow(
@@ -192,6 +207,7 @@ public class CourseSearchController implements Initializable {
                     prereq,
                     section.isFull(),
                     isEnrolled,
+                    isInWaitlist,
                     course != null ? course.getDepartment() : ""
                 );
                 allCourses.add(row);
@@ -202,6 +218,19 @@ public class CourseSearchController implements Initializable {
             
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Hata", "Dersler yüklenirken hata: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Öğrencinin bekleme listesinde olup olmadığını kontrol eder
+     */
+    private boolean isStudentInWaitlist(int studentId, int sectionId) {
+        try {
+            List<WaitingList> waitlist = waitingListDAO.findByStudent(studentId);
+            return waitlist.stream().anyMatch(w -> w.getSectionId() == sectionId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
     
@@ -314,16 +343,17 @@ public class CourseSearchController implements Initializable {
         alert.showAndWait();
     }
     
-    // Row sınıfı
+    // Row sınıfı - inWaitlist eklendi
     public static class CourseRow {
         private int sectionId;
         private String courseCode, courseName, sectionNumber, instructor;
         private String day, time, room, capacity, credits, prerequisite, department;
-        private boolean full, enrolled;
+        private boolean full, enrolled, inWaitlist;
         
         public CourseRow(int sectionId, String courseCode, String courseName, String sectionNumber,
                          String instructor, String day, String time, String room, String capacity,
-                         String credits, String prerequisite, boolean full, boolean enrolled, String department) {
+                         String credits, String prerequisite, boolean full, boolean enrolled, 
+                         boolean inWaitlist, String department) {
             this.sectionId = sectionId;
             this.courseCode = courseCode;
             this.courseName = courseName;
@@ -337,6 +367,7 @@ public class CourseSearchController implements Initializable {
             this.prerequisite = prerequisite;
             this.full = full;
             this.enrolled = enrolled;
+            this.inWaitlist = inWaitlist;
             this.department = department;
         }
         
@@ -354,6 +385,7 @@ public class CourseSearchController implements Initializable {
         public String getPrerequisite() { return prerequisite; }
         public boolean isFull() { return full; }
         public boolean isEnrolled() { return enrolled; }
+        public boolean isInWaitlist() { return inWaitlist; }
         public String getDepartment() { return department; }
     }
 }

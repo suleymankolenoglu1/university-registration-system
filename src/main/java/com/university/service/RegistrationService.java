@@ -334,8 +334,12 @@ public class RegistrationService {
         return MAX_CREDITS_PER_SEMESTER - getCurrentSemesterCredits(studentId);
     }
 
-    public Section getSectionById(int sectionId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSectionById'");
+     public Section getSectionById(int sectionId) {
+        try {
+            return sectionDAO.findById(sectionId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
